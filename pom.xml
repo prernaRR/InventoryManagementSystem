@@ -7,6 +7,7 @@
     <groupId>com.inventory</groupId>
     <artifactId>InventoryManagementSystem</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>Inventory</name>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -28,24 +29,32 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>21.0.6</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>21.0.6</version>
+            <version>${javafx.version}</version>
         </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
+            <!--Maven Compiler-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <!--JavaFx Maven-->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
+
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.inventory.Main</mainClass>
+                    <mainClass>com.inventory.Launcher</mainClass>
                 </configuration>
             </plugin>
         </plugins>
