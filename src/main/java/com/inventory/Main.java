@@ -2,29 +2,20 @@ package com.inventory;
 
 import com.inventory.database.DatabaseManager;
 import javafx.application.Application;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import com.inventory.view.HomePage;
 
 public class Main extends Application {
     @Override
     public void start(Stage stage) {
 
-        Button btn = new Button("Hello Inventory");
+        DatabaseManager.initDatabase();
 
-        StackPane root = new StackPane(btn);
-
-        Scene scene = new Scene(root, 600, 400);
-
-        stage.setTitle("Inventory Management System");
-        stage.setScene(scene);
-        stage.show();
+        new HomePage().show(stage);
     }
 
     public static void main(String[] args)
     {
-        DatabaseManager.initDatabase();
         launch(args);
     }
 }
