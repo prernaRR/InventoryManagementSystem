@@ -1,4 +1,4 @@
-package com.inventory.view;
+package com.inventory.view.components;
 
 import com.inventory.view.HomePage;
 import javafx.geometry.Pos;

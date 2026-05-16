@@ -2,6 +2,8 @@ package com.inventory.view;
 
 import com.inventory.controller.ProductController;
 import com.inventory.model.Product;
+import com.inventory.view.components.ActionButton;
+import com.inventory.view.components.AppHeader;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,6 +22,7 @@ public class ProductView {
 
     public void show(Stage stage) {
 
+        // Header
         VBox header = AppHeader.create(stage, "Manage Products");
 
         // Search bar
@@ -30,8 +33,7 @@ public class ProductView {
         TextField searchField = new TextField();
         searchField.setPromptText("Enter product name or code");
         searchField.setPrefWidth(200);
-        Button searchBtn = new Button("Search");
-        searchBtn.setStyle("-fx-background-color: #092e53; -fx-text-fill: white;");
+        Button searchBtn = ActionButton.create("Search");
 
         HBox searchBox = new HBox(10, search, searchField, searchBtn);
         searchBox.setAlignment(Pos.CENTER_LEFT);
@@ -87,7 +89,7 @@ public class ProductView {
 
         // Load products from database
         table.getItems().addAll(controller.getAllProducts());
-        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Search button action
         searchBtn.setOnAction(e -> {
@@ -114,19 +116,102 @@ public class ProductView {
         TextField thresholdField = new TextField();
 
         // Buttons
-        Button addBtn = new Button("Add");
-        Button updateBtn = new Button("Update");
-        Button deleteBtn = new Button("Delete");
-        Button clearBtn = new Button("Clear");
+        Button addBtn = ActionButton.create("Add");
+        Button updateBtn = ActionButton.create("Update");
+        Button deleteBtn = ActionButton.create("Delete");
+        Button clearBtn = ActionButton.create("Clear");
 
-        String buttonStyle = "-fx-background-color: #092e53;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-weight: bold;";
+        // Table click
+        table.setOnMouseClicked(e -> {
+            Product p = table.getSelectionModel().getSelectedItem();
 
-        addBtn.setStyle(buttonStyle);
-        updateBtn.setStyle(buttonStyle);
-        deleteBtn.setStyle(buttonStyle);
-        clearBtn.setStyle(buttonStyle);
+            if (p != null) {
+                nameField.setText(p.getName());
+                categoryField.setText(p.getCategory());
+                quantityField.setText(String.valueOf(p.getQuantity()));
+                costField.setText(String.valueOf(p.getCostPrice()));
+                sellingField.setText(String.valueOf(p.getSellingPrice()));
+                supplierField.setText(String.valueOf(p.getSupplierId()));
+                thresholdField.setText(String.valueOf(p.getThreshold()));
+            }
+        });
+
+        // Button actions
+        // ADD
+        addBtn.setOnAction(e -> {
+            try {
+                Product p = new Product(
+                        nameField.getText(),
+                        categoryField.getText(),
+                        Integer.parseInt(quantityField.getText()),
+                        Double.parseDouble(costField.getText()),
+                        Double.parseDouble(sellingField.getText()),
+                        Integer.parseInt(supplierField.getText()),
+                        Integer.parseInt(thresholdField.getText())
+                );
+
+                controller.addProduct(p);
+                table.getItems().setAll(controller.getAllProducts());
+
+            } catch (NumberFormatException ex) {
+                System.out.println("Invalid input");
+            }
+        });
+
+        //UPDATE
+        updateBtn.setOnAction(e -> {
+            // Get the selected supplier and store in selectedRow
+            Product selectedRow = table.getSelectionModel().getSelectedItem();
+
+            if (selectedRow != null) {
+                try {
+                    // Takes the admin input from UI and updates the selected supplier details in memory
+                    selectedRow.setName(nameField.getText());
+                    selectedRow.setCategory(categoryField.getText());
+                    selectedRow.setQuantity(Integer.parseInt(quantityField.getText()));
+                    selectedRow.setCostPrice(Double.parseDouble(costField.getText()));
+                    selectedRow.setSellingPrice(Double.parseDouble(sellingField.getText()));
+                    selectedRow.setSupplierId(Integer.parseInt(supplierField.getText()));
+                    selectedRow.setThreshold(Integer.parseInt(thresholdField.getText()));
+
+                    // Updates the database - sends the update to controller and then controller updates the record in the database
+                    controller.updateProduct(selectedRow);
+
+                    // Updates the tables
+                    table.getItems().setAll(controller.getAllProducts());
+                    table.getSelectionModel().clearSelection();
+
+                } catch (NumberFormatException ex) {
+                    System.out.println("Invalid input");
+                }
+            }
+        });
+
+        // https://stackoverflow.com/questions/26424769/javafx8-how-to-create-listener-for-selection-of-row-in-tableview
+        // DELETE
+        deleteBtn.setOnAction(e -> {
+            // Gets the row the admin clicked
+            Product selectedRow = table.getSelectionModel().getSelectedItem();
+
+            // Check if a row is selected
+            if (selectedRow != null) {
+                // Delete from database
+                controller.deleteProduct(selectedRow.getProductCode()); // sends the supplier id to delete it from database
+                // Updates the table from database again to show the changes
+                table.getItems().setAll(controller.getAllProducts());
+            }
+        });
+
+        // CLEAR
+        clearBtn.setOnAction(e -> {
+            nameField.clear();
+            categoryField.clear();
+            quantityField.clear();
+            costField.clear();
+            sellingField.clear();
+            supplierField.clear();
+            thresholdField.clear();
+        });
 
         HBox buttonRow1 = new HBox(10, addBtn, updateBtn, deleteBtn);
         HBox buttonRow2 = new HBox(clearBtn);
@@ -141,11 +226,11 @@ public class ProductView {
                 new HBox(10,new Label("Selling Price"), sellingField),
                 new HBox(10,new Label("Supplier ID"), supplierField),
                 new HBox(10,new Label("Threshold"), thresholdField),
-
                 buttonBox
         );
 
         form.setPadding(new Insets(10));
+        form.setPrefWidth(300);
 
         HBox content = new HBox(20, leftSection, form);
         content.setPadding(new Insets(10));

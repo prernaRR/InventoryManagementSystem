@@ -2,8 +2,8 @@ package com.inventory.view;
 
 import com.inventory.controller.ProductController;
 import com.inventory.model.Product;
+import com.inventory.view.components.AppHeader;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;

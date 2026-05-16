@@ -10,7 +10,8 @@ public class ProductDAO {
 
     // Add product to the database
     public void addProduct(Product p) {
-        String sql = "INSERT INTO products" + "(name, category, quantity, cost_price, selling_price, supplier_id, threshold)"
+        String sql = "INSERT INTO products"
+                + "(name, category, quantity, cost_price, selling_price, supplier_id, threshold)"
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.connect();
@@ -59,7 +60,7 @@ public class ProductDAO {
                 products.add(p);
             }
         } catch (Exception e) {
-            System.out.println("Error adding product: " + e.getMessage());
+            System.out.println("Error loading product: " + e.getMessage());
         }
 
         return products;

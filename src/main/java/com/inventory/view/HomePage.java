@@ -23,7 +23,7 @@ public class HomePage {
 
         // Header Title
         Label title = new Label("Hardware Store Inventory Management System");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+        title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Welcome message
         Label welcome = new Label("Welcome Admin!");
@@ -49,7 +49,7 @@ public class HomePage {
             productView.show(stage);
         });
 
-        /*supplierBtn.setOnAction(e -> {
+        supplierBtn.setOnAction(e -> {
             SupplierView supplierView = new SupplierView();
             supplierView.show(stage);
         });
@@ -57,7 +57,7 @@ public class HomePage {
         updateStockBtn.setOnAction(e -> {
             UpdateStockView updateStockView = new UpdateStockView();
             updateStockView.show(stage);
-        }); */
+        });
 
         alertBtn.setOnAction(e -> {
             AlertView alertView = new AlertView();

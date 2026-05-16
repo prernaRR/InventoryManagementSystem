@@ -2,6 +2,9 @@ package com.inventory.view;
 
 import com.inventory.controller.SupplierController;
 import com.inventory.model.Supplier;
+import com.inventory.view.components.ActionButton;
+import com.inventory.view.components.AppHeader;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -25,8 +28,7 @@ public class SupplierView {
         TextField searchField = new TextField();
         searchField.setPromptText("Enter supplier name or ID");
         searchField.setPrefWidth(200);
-        Button searchBtn = new Button("Search");
-        searchBtn.setStyle("-fx-background-color: #092e53; -fx-text-fill: white;");
+        Button searchBtn = ActionButton.create("Search");
 
         HBox searchBox = new HBox(10, search, searchField, searchBtn);
         searchBox.setAlignment(Pos.CENTER_LEFT);
@@ -57,7 +59,7 @@ public class SupplierView {
 
         // Load supplier from database
         table.getItems().addAll(controller.getAllSuppliers());
-        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Search button action
         searchBtn.setOnAction(e -> {
@@ -78,19 +80,75 @@ public class SupplierView {
         TextField emailField = new TextField();
 
         // Buttons
-        Button addBtn = new Button("Add");
-        Button updateBtn = new Button("Update");
-        Button deleteBtn = new Button("Delete");
-        Button clearBtn = new Button("Clear");
+        Button addBtn = ActionButton.create("Add");
+        Button updateBtn = ActionButton.create("Update");
+        Button deleteBtn = ActionButton.create("Delete");
+        Button clearBtn = ActionButton.create("Clear");
 
-        String buttonStyle = "-fx-background-color: #092e53;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-weight: bold;";
+        // Table click
+        table.setOnMouseClicked(e -> {
+            Supplier s = table.getSelectionModel().getSelectedItem();
 
-        addBtn.setStyle(buttonStyle);
-        updateBtn.setStyle(buttonStyle);
-        deleteBtn.setStyle(buttonStyle);
-        clearBtn.setStyle(buttonStyle);
+            if (s != null) {
+                nameField.setText(s.getName());
+                contactField.setText(s.getContactNumber());
+                emailField.setText(s.getEmail());
+            }
+        });
+
+        // Button actions
+        // ADD
+        addBtn.setOnAction(e -> {
+            Supplier s = new Supplier(
+                    nameField.getText(),
+                    contactField.getText(),
+                    emailField.getText()
+            );
+            controller.addSupplier(s);
+            table.getItems().setAll(controller.getAllSuppliers());
+        });
+
+        //UPDATE
+        updateBtn.setOnAction(e -> {
+            // Get the selected supplier and store in selectedRow
+            Supplier selectedRow = table.getSelectionModel().getSelectedItem();
+
+            if (selectedRow != null) {
+                // Takes the admin input from UI and updates the selected supplier details in memory
+                selectedRow.setName(nameField.getText());
+                selectedRow.setContactNumber(contactField.getText());
+                selectedRow.setEmail(emailField.getText());
+
+                // Updates the database - sends the update to controller and then controller updates the record in the database
+                controller.updateSupplier(selectedRow);
+
+                // Updates the tables
+                table.getItems().setAll(controller.getAllSuppliers());
+                table.getSelectionModel().clearSelection();
+            }
+        });
+
+        // https://stackoverflow.com/questions/26424769/javafx8-how-to-create-listener-for-selection-of-row-in-tableview
+        // DELETE
+        deleteBtn.setOnAction(e -> {
+            // Gets the row the admin clicked
+            Supplier selectedRow = table.getSelectionModel().getSelectedItem();
+
+            // Check if a row is selected
+            if (selectedRow != null) {
+                // Delete from database
+                controller.deleteSupplier(selectedRow.getSupplierId()); // sends the supplier id to delete it from database
+                // Updates the table from database again to show the changes
+                table.getItems().setAll(controller.getAllSuppliers());
+            }
+        });
+
+        // CLEAR
+        clearBtn.setOnAction(e -> {
+            nameField.clear();
+            contactField.clear();
+            emailField.clear();
+        });
 
         HBox buttonRow1 = new HBox(10, addBtn, updateBtn, deleteBtn);
         HBox buttonRow2 = new HBox(clearBtn);
@@ -101,7 +159,6 @@ public class SupplierView {
                 new HBox(10,new Label("Name"), nameField),
                 new HBox(10,new Label("Contact"), contactField),
                 new HBox(10,new Label("Email"), emailField),
-
                 buttonBox
         );
 
@@ -118,7 +175,7 @@ public class SupplierView {
 
         Scene scene = new Scene(root, 1000, 600);
 
-        stage.setTitle("Manage Products");
+        stage.setTitle("Manage Suppliers");
         stage.setScene(scene);
         stage.show();
     }
